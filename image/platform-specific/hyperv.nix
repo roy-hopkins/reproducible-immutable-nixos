@@ -17,10 +17,7 @@
     "hv_sock"
   ];
 
-  # Enable Hyper-V guest services
-  services.hypervkvpd.enable = true;
-  services.hypervvssd.enable = true;
-  services.hypervfcopyd.enable = true;
+  # Note: Individual Hyper-V services are managed by virtualisation.hypervGuest.enable
 
   # Configure network for Hyper-V
   systemd.network = {
@@ -36,12 +33,6 @@
       };
     };
   };
-
-  # Hyper-V specific kernel parameters
-  boot.kernelParams = [
-    # Remove the serial console parameter from base.nix since Hyper-V uses different console
-    # We'll override this in the base configuration
-  ];
 
   # Override the serial console setting from base.nix for Hyper-V
   boot.kernelParams = [

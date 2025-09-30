@@ -17,7 +17,10 @@
           qemu-image = pkgs.callPackage ./image {
             platform = "qemu";
           };
-          boot-uefi-qemu = pkgs.callPackage ./utils/boot-uefi-qemu.nix { };
+          hyperv-image = pkgs.callPackage ./image/hyperv.nix {
+            platform = "hyperv";
+          };
+          #boot-uefi-qemu = pkgs.callPackage ./utils/boot-uefi-qemu.nix { };
         };
       };
     };
