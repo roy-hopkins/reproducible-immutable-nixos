@@ -32,6 +32,8 @@
 
   environment.systemPackages = with pkgs; [
     cryptsetup
+    tpm2-tss
+    tpm2-tools
   ];
 
   system = {
