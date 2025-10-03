@@ -24,8 +24,8 @@
     networks."10-ethernet" = {
       matchConfig.Name = "eth*";
       networkConfig = {
-        DHCP = "yes";
-        IPv6AcceptRA = true;
+        DHCP = "ipv4";
+        IPv6AcceptRA = false;
       };
       dhcpV4Config = {
         UseDNS = true;

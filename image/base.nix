@@ -1,5 +1,6 @@
 {
   pkgs,
+  cvmattest,
   ...
 }:
 {
@@ -34,6 +35,9 @@
     cryptsetup
     tpm2-tss
     tpm2-tools
+    stdenv.cc.cc.lib
+    curl
+    cvmattest
   ];
 
   system = {

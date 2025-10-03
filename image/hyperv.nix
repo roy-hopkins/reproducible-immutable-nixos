@@ -2,6 +2,7 @@
   pkgs,
   lib,
   platform,
+  cvmattest,
   withDebug ? true,
   ...
 }:
@@ -15,8 +16,10 @@ let
     {
       modulesPath,
       ...
-    }:
+    }@args:
     {
+      _module.args = { inherit cvmattest; };
+      
       boot.kernelParams = [
         "roothash=${roothashPlaceholder}"
       ];
