@@ -28,26 +28,35 @@
           cvmattest = pkgs.stdenv.mkDerivation {
             pname = "cvmattest";
             version = "1.0";
-            src = ./bin;  # Point to the directory containing all files
-            
-            nativeBuildInputs = [ pkgs.patchelf ];
-            buildInputs = [ pkgs.curl ];
-            
+            src = ./bin;
+
+            nativeBuildInputs = [ pkgs.autoPatchelfHook pkgs.patchelf ];
+            buildInputs = [ 
+              pkgs.curl 
+              pkgs.stdenv.cc.cc 
+              pkgs.tpm2-tss
+              pkgs.openssl_3
+              pkgs.libuuid
+            ];
+
+            # We copy files; autoPatchelf runs in fixupPhase and will patch ELF RPATHs
             installPhase = ''
-              mkdir -p $out/bin
-              mkdir -p $out/lib
-              
-              # Copy the executable
+              runHook preInstall
               install -Dm755 $src/CVMAttest $out/bin/CVMAttest
-              
-              # Copy the shared library
-              install -Dm644 $src/libedge-cc-base-attestation-sdk.so $out/lib/libedge-cc-base-attestation-sdk.so
-              
-              # Patch the binary to find libraries
-              echo "Patching CVMAttest binary..."
-              patchelf --set-rpath "${pkgs.lib.makeLibraryPath [ pkgs.curl ]}:$out/lib" $out/bin/CVMAttest || echo "patchelf failed, continuing..."
+              install -Dm644 $src/libedge-cc-base-attestation-sdk.so \
+                $out/lib/libedge-cc-base-attestation-sdk.so
+              runHook postInstall
             '';
-            
+
+            # Ensure interpreter & final RPATH explicitly include our lib dir + dependencies
+            postFixup = ''
+              echo "Final patchelf adjustments for CVMAttest"
+              interp="$(cat $NIX_CC/nix-support/dynamic-linker)"
+              patchelf --set-interpreter "$interp" $out/bin/CVMAttest || true
+              patchelf --set-rpath "${pkgs.lib.makeLibraryPath [ pkgs.curl pkgs.stdenv.cc.cc ]}:$out/lib" \
+                $out/bin/CVMAttest || true
+            '';
+
             meta = with pkgs.lib; {
               description = "CVM Attestation test tool";
               platforms = platforms.linux;
